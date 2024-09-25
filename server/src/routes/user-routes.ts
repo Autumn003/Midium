@@ -1,3 +1,4 @@
+import { signinInput, signupInput } from "@hemant003/medium-common";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { Hono } from "hono";
@@ -17,6 +18,11 @@ export const userRouter  = new Hono<{
   }).$extends(withAccelerate())
   
     const body = await c.req.json();
+    const { success } = signupInput.safeParse(body)
+    if(!success){
+      c.status(400);
+      return c.json({error: "Invalid input"});
+    }  
   
     try {
       const user = await prisma.user.create({
@@ -43,6 +49,11 @@ export const userRouter  = new Hono<{
   }).$extends(withAccelerate())
   
   const body = await c.req.json();
+	const { success } = signinInput.safeParse(body)
+	if(!success){
+		c.status(400);
+		return c.json({error: "Invalid input"});
+	}
   
   try {
     const user = await prisma.user.findUnique({
